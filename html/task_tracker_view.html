@@ -1,0 +1,70 @@
+<div id="task_tracker_module">
+
+  <h1>Task Tracker</h1>
+  
+  <h2>View/Edit Task</h2>
+  
+  <fieldset>
+    <div class="fieldrow">
+      <label class="required">Name</label>
+      <input class="edit-perms" id="task_tracker_name" type="text">
+      <div class="view-perms" id="task_tracker_name_view"></div>
+    </div>
+    
+    <div class="fieldrow">
+      <label>Description</label>
+      <textarea class="edit-perms" id="task_tracker_description" rows="5"></textarea>
+      <div class="view-perms" id="task_tracker_description_view"></div>
+    </div>
+    
+    <div class="fieldrow">
+      <label>Assigned Users</label>
+      <div>
+        <div>
+          <select class="edit-perms" id="task_tracker_users"></select>
+          <button class="add edit-perms" onclick="OBModules.TaskTracker.addUser();">Add User</button>
+        </div>
+        <div id="task_tracker_users_list">
+          <div id="task_tracker_users_list_dummy"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="fieldrow">
+      <label>Media Items</label>
+      <div id="task_tracker_media">
+        <div id="task_media_dummy"></div>
+      </div>
+    </div>
+    
+    <div class="fieldrow">
+      <label>Playlist Items</label>
+      <div id="task_tracker_playlists">
+        <div id="task_playlists_dummy"></div>
+      </div>
+    </div>
+
+    <div class="fieldrow">
+      <button class="edit edit-perms" onclick="OBModules.TaskTracker.updateTask();">Update Task</button>
+      <button onclick="OBModules.TaskTracker.closeTask();">Close Task</button>
+      <input id="task_tracker_current_id" type="hidden">
+    </div>
+  </fieldset>
+  
+  <h2>Comments</h2>
+  
+  <fieldset>
+    <div class="fieldrow">
+      <textarea id="task_tracker_comment" placeholder="Add a comment to this task"></textarea>
+    </div>
+    
+    <div class="fieldrow">
+      <button class="add" onclick="OBModules.TaskTracker.addComment();">Add Comment</button>
+    </div>
+    
+    <div class="fieldrow">
+      <div id="task_tracker_comment_list"></div>
+    </div>
+  </fieldset>
+
+</div>

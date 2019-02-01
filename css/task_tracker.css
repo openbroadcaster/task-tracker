@@ -1,0 +1,44 @@
+#task_tracker_media {
+  width: 250px;
+  min-height: 60px;
+}
+
+#task_tracker_playlists {
+  width: 250px;
+  min-height: 60px;
+}
+
+#task_tracker_media div {
+  margin-top: 0px;
+}
+
+#task_tracker_playlists div {
+  margin-top: 0px;
+}
+
+#task_tracker_list td {
+  padding-right: 8px;
+}
+
+#task_tracker_list tr {
+  padding-bottom: 6px;
+}
+
+#task_tracker_users {
+  min-width: 175px;
+}
+
+#task_tracker_users_list {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.task_table_first {
+  text-align: right;
+  width: 200px;
+}
+
+#task_tracker_comment {
+  min-width: 400px;
+  min-height: 60px;
+}
