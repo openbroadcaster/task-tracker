@@ -291,13 +291,17 @@ OBModules.TaskTracker = new function () {
   /* viewTask(link) replaces the TaskTracker view with a new one for 
   viewing individual tasks, and is called from inside the main view
   whenever someone tries to view or edit a task. Note that the link
-  in viewTask(link) relies on getting a proper element from the main
-  view. */
+  in viewTask(link) relies on either getting a proper element from 
+  the main view, or having a task ID passed to it. */
   this.viewTask = function (link) {
     OB.UI.replaceMain('modules/task_tracker/task_tracker_view.html');
     
     var post = {};
-    post.task_id = $(link).parents('tr').first().attr('data-task_id');;
+    if (typeof(link) == "object") {   
+      post.task_id = $(link).parents('tr').first().attr('data-task_id');
+    } else {
+      post.task_id = link;
+    }
     OB.API.post('tasktracker', 'viewTask', post, function (response) {
       
       var msg_result = (response.status ? 'success' : 'error');
@@ -312,6 +316,7 @@ OBModules.TaskTracker = new function () {
         var task_users       = response.data.users;
         var task_media       = response.data.media;
         var task_playlists   = response.data.playlists;
+        var task_comments    = response.data.comments;        
         
         var task_perms       = response.data.permissions;
         
@@ -332,9 +337,7 @@ OBModules.TaskTracker = new function () {
         }
         
         OBModules.TaskTracker.loadUsers();
-        
-        console.log(response.data);
-        
+                
         $(task_users).each(function (index, element) {
           var elem_user_id      = element.user.id;
           var elem_user_display = element.user.display_name;
@@ -389,6 +392,22 @@ OBModules.TaskTracker = new function () {
           });
         }
 
+        $(task_comments).each(function (index, element) {
+          var elem_comm_text = element.comment;
+          var elem_comm_user = element.user.display_name;
+          var elem_comm_time = format_timestamp(element.created);
+          
+          $html = $('<div/>');
+          $html_text = $('<p/>').text(elem_comm_text);
+          $html_user = $('<h4/>').text(elem_comm_user);
+          $html_time = $('<p/>').append($('<em/>').text(elem_comm_time));
+          $html.append($html_user);
+          $html.append($html_text);
+          $html.append($html_time);
+          
+          $('#task_tracker_comment_list').append($html);
+        });
+        
         OBModules.TaskTracker.updateTaskDummy(task_perms);
       }
       
@@ -475,6 +494,18 @@ OBModules.TaskTracker = new function () {
   /* addComment() adds a comment to the currently opened task, then
   refreshes the task view. */
   this.addComment = function () {
+    var post = {};
+    var task_id = $('#task_tracker_current_id').val();
+    post.task_id = task_id; 
+    post.comment = $('#task_tracker_comment').val();
+    
+    OB.API.post('tasktracker', 'addComment', post, function (response) {
+      OBModules.TaskTracker.viewTask(task_id);
+      
+      var msg_result = (response.status ? 'success' : 'error');
+      $('#task_tracker_message').obWidget(msg_result, response.msg);
+    })
+    
     return false;
   }
 }

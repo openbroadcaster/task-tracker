@@ -89,4 +89,21 @@ class TaskTracker extends OBFController {
     $result = $task_model('updateTask', $data);    
     return $result;
   }
+  
+  public function addComment () {
+    $task_model = $this->load->model('TaskTracker');
+    
+    $data = [
+      'task_id' => $this->data('task_id'),
+      'comment' => $this->data('comment')      
+    ];
+    
+    $status = $task_model('validateComment', $data);
+    if (!$status[0]) {
+      return $status;
+    }
+    
+    $status = $task_model('addComment', $data);
+    return $status;
+  }
 }

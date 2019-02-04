@@ -107,11 +107,31 @@ class TaskTrackerModel extends OBFModel {
       );
     }
     
+    $this->db->where('task_id', $data['task_id']);
+    $this->db->orderby('created', 'desc');
+    $comment_items = $this->db->get('module_task_tracker_comments');
+    $user_model    = $this->load->model('users');
+    $comments      = [];
+    foreach ($comment_items as $elem) {
+      $user_item  = $user_model('get_by_id', $elem['user_id']);
+      $comments[] = array(
+        'id'      => $elem['id'],
+        'task_id' => $elem['task_id'],
+        'user'    => array(
+          'id'           => $user_item['id'],
+          'display_name' => $user_item['display_name']
+        ),
+        'comment' => $elem['comment'],
+        'created' => $elem['created']
+      );
+    }
+    
     $result = array(
       'task'      => $task[0],
       'users'     => $users,
       'media'     => $media,
-      'playlists' => $playlists
+      'playlists' => $playlists,
+      'comments'  => $comments
     );
     return [true, 'Successfully loaded task from database.', $result];
   }
@@ -187,5 +207,29 @@ class TaskTrackerModel extends OBFModel {
     }
     
     return [true, 'Successfully updated task'];
+  }
+  
+  public function validateComment ($data) {
+    $this->db->where('id', $data['task_id']);
+    $task = $this->db->get('module_task_tracker');
+    
+    if (!$task) {
+      return [false, 'Failed to retrieve task from database.'];
+    }
+    
+    return [true, 'Comment data is valid.'];
+  }
+  
+  public function addComment ($data) {
+    $user_id = $this->user->param('id');      
+    $comment = [
+      'task_id' => $data['task_id'],
+      'user_id' => $user_id,
+      'comment' => $data['comment'],
+      'created' => time()
+    ];
+    $this->db->insert('module_task_tracker_comments', $comment);
+    
+    return [true, 'Comment submitted.'];
   }
 }
