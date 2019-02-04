@@ -45,6 +45,7 @@ class TaskTrackerModule extends OBFModule {
       `task_id` int(10) unsigned NOT NULL,
       `user_id` int(11) unsigned NOT NULL,
       `comment` text,
+      `created` int(11) unsigned NOT NULL,
       PRIMARY KEY (`id`)
     ) ENGINE MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
     
