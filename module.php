@@ -10,6 +10,11 @@ class TaskTrackerModule extends OBFModule {
   }
   
   public function install () {
+    $this->db->insert('users_permissions', [
+      'category'    => 'task tracker',
+      'description' => 'manage tasks',
+      'name'        => 'task_tracker_module_manage'
+    ]);
     
     $this->db->query('CREATE TABLE IF NOT EXISTS `module_task_tracker` (
       `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -53,6 +58,14 @@ class TaskTrackerModule extends OBFModule {
   }
   
   public function uninstall () {
+    $this->db->where('name','task_tracker_module_manage');
+    $permission = $this->db->get_one('users_permissions');
+
+    $this->db->where('permission_id', $permission['id']);
+    $this->db->delete('users_permissions_to_groups');
+
+    $this->db->where('id', $permission['id']);
+    $this->db->delete('users_permissions');
     
     // Keep tables for now.
     // $this->db->query('DROP TABLE `module_task_tracker`');

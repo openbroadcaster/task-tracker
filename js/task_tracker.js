@@ -24,17 +24,24 @@ OBModules.TaskTracker = new function () {
   this.open = function () {
     OB.UI.replaceMain('modules/task_tracker/task_tracker.html');
     
-    OBModules.TaskTracker.loadUsers();
+    if (OB.Settings.permissions.includes('task_tracker_module_manage')) {
+      OBModules.TaskTracker.loadUsers();
     
-    $('#task_tracker_media').droppable({
-      drop: OBModules.TaskTracker.droppableMedia
-    });
+      $('#task_tracker_media').droppable({
+        drop: OBModules.TaskTracker.droppableMedia
+      });
     
-    $('#task_tracker_playlists').droppable({
-      drop: OBModules.TaskTracker.droppablePlaylists
-    });
+      $('#task_tracker_playlists').droppable({
+        drop: OBModules.TaskTracker.droppablePlaylists
+      });
     
-    OBModules.TaskTracker.loadTaskOverview();
+      OBModules.TaskTracker.loadTaskOverview(true);
+    } else {
+      $('.task_manager').hide();
+      
+      OBModules.TaskTracker.loadTaskOverview(false);
+      
+    }
   }
   
   /* loadUsers() loads all users from the database into the HTML
@@ -215,10 +222,10 @@ OBModules.TaskTracker = new function () {
     });
   }
   
-  /* loadTaskOverview() is part of the open() method for the task list,
-  posting to the controller and putting all the retrieved information in
-  the right fields in the HTML. */
-  this.loadTaskOverview = function () {
+  /* loadTaskOverview(editable) is part of the open() method for the task
+  list,  posting to the controller and putting all the retrieved information
+  in the right fields in the HTML. */
+  this.loadTaskOverview = function (editable) {
     OB.API.post('tasktracker', 'loadTaskOverview', {}, function (response) {
       
       var msg_result = (response.status ? 'success' : 'error');
@@ -236,8 +243,8 @@ OBModules.TaskTracker = new function () {
           item.append($('<td/>').text(element.name).addClass('task_table_first'));
           item.append($('<td/>').text(element.description));
           
-          item.append($('<td/>').append('<a onclick="return OBModules.TaskTracker.viewTask(this)" href="#">[view]</a>'));
-          item.append($('<td/>').append('<a onclick="return OBModules.TaskTracker.removeTask(this)" href="#">[delete]</a>'));
+          item.append($('<td/>').append('<a class="button" onclick="return OBModules.TaskTracker.viewTask(this)" href="#">View</a>'));
+          if (editable) item.append($('<td/>').append('<a class="button delete" onclick="return OBModules.TaskTracker.removeTask(this)" href="#">Delete</a>'));
           
           $('#task_tracker_list').append(item);
         })
@@ -278,7 +285,7 @@ OBModules.TaskTracker = new function () {
       var msg_result = (response.status ? 'success' : 'error');
       $('#task_tracker_message').obWidget(msg_result, response.msg);
       
-      OBModules.TaskTracker.loadTaskOverview();
+      OBModules.TaskTracker.loadTaskOverview(true);
     });
     
     return false;
@@ -306,6 +313,8 @@ OBModules.TaskTracker = new function () {
       
       var msg_result = (response.status ? 'success' : 'error');
       if (msg_result == 'error') {
+        OBModules.TaskTracker.open();
+        
         $('#task_tracker_message').obWidget(msg_result, response.msg);
       }
       
@@ -329,14 +338,14 @@ OBModules.TaskTracker = new function () {
         $('#task_tracker_description_view').text(task_description);
         
         if (task_perms == 'edit') {
+          OBModules.TaskTracker.loadUsers();
+          
           $('#task_tracker_module .edit-perms').show();
           $('#task_tracker_module .view-perms').hide();
         } else {          
           $('#task_tracker_module .edit-perms').hide();
           $('#task_tracker_module .view-perms').show();
         }
-        
-        OBModules.TaskTracker.loadUsers();
                 
         $(task_users).each(function (index, element) {
           var elem_user_id      = element.user.id;
@@ -415,6 +424,44 @@ OBModules.TaskTracker = new function () {
     
     return false;
   }  
+  
+  /* refreshComments(task_id) is called when viewTask is excessive, and
+  when only the list of comments need to be reloaded: this is helpful
+  so the screen doesn't flash unnecessarily after posting a comment,
+  for example. */
+  this.refreshComments = function (task_id) {
+    var post = {};
+    post.task_id = task_id;
+    
+    OB.API.post('tasktracker', 'viewTask', post, function (response) {
+      
+      var msg_result = (response.status ? 'success' : 'error');
+      if (msg_result == 'error') {
+        $('#task_tracker_message').obWidget(msg_result, response.msg);
+      }
+      
+      if (response.status) {
+        $('#task_tracker_comment_list').empty();
+        
+        var task_comments    = response.data.comments; 
+        $(task_comments).each(function (index, element) {
+          var elem_comm_text = element.comment;
+          var elem_comm_user = element.user.display_name;
+          var elem_comm_time = format_timestamp(element.created);
+          
+          $html = $('<div/>');
+          $html_text = $('<p/>').text(elem_comm_text);
+          $html_user = $('<h4/>').text(elem_comm_user);
+          $html_time = $('<p/>').append($('<em/>').text(elem_comm_time));
+          $html.append($html_user);
+          $html.append($html_text);
+          $html.append($html_time);
+          
+          $('#task_tracker_comment_list').append($html);
+        });
+      }
+    });
+  }
   
   /* updateTaskDummy(perms) is a helper methods that updates the dummy
   value for playlists and media based on 1. the view/edit permissions
@@ -500,7 +547,7 @@ OBModules.TaskTracker = new function () {
     post.comment = $('#task_tracker_comment').val();
     
     OB.API.post('tasktracker', 'addComment', post, function (response) {
-      OBModules.TaskTracker.viewTask(task_id);
+      OBModules.TaskTracker.refreshComments(task_id);
       
       var msg_result = (response.status ? 'success' : 'error');
       $('#task_tracker_message').obWidget(msg_result, response.msg);

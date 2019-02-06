@@ -3,6 +3,11 @@
 class TaskTracker extends OBFController {
   
   public function addTask () {
+    $manager  = $this->user->check_permission('task_tracker_module_manage');
+    if (!$manager) {
+      return [false, 'User does not have permission to add new tasks.'];
+    }
+    
     $task_model = $this->load->model('TaskTracker');
     $status     = [false, 'Failed to retrieve data from Task Tracker model.'];
     
@@ -24,6 +29,11 @@ class TaskTracker extends OBFController {
   }
   
   public function loadUsers () {
+    $manager = $this->user->check_permission('task_tracker_module_manage');
+    if (!$manager) {
+      return [false, 'User is not allowed to request list of users.'];
+    }
+    
     $users_model = $this->load->model('users');
     $users       = $users_model('user_list');
     
@@ -39,24 +49,44 @@ class TaskTracker extends OBFController {
     $task_model = $this->load->model('TaskTracker');
     $result     = [false, 'Failed to retrieve data from Task Tracker model.'];
     
-    $result     = $task_model('loadTaskOverview');    
+    $manager    = $this->user->check_permission('task_tracker_module_manage');
+    if ($manager) {
+      $result = $task_model('loadTaskOverview');      
+    } else {
+      $result = $task_model('loadTaskOverview', $this->user->param('id'));
+    }
+    
     return $result;
   }
   
   public function viewTask () {
     $task_model = $this->load->model('TaskTracker');
     $result     = [false, 'Failed to retrieve data from Task Tracker model.'];
-    
+    $task_id    = $this->data('task_id');
+        
     $data = [
-      'task_id' => $this->data('task_id')
+      'task_id' => $task_id
     ];
     
+    $manager  = $this->user->check_permission('task_tracker_module_manage');
+    $assigned = $task_model('currentUserAssigned', $task_id);
+    
+    if (!$manager && !$assigned) {
+      return [false, 'User is not allowed to view task'];
+    }
+    
     $result                     = $task_model('viewTask', $data);
-    $result[2]['permissions']   = 'view'; // TODO, dynamic permissions
+    $result[2]['permissions']   = ($manager ? 'edit' : 'view');
+    
     return $result;
   }
   
   public function removeTask () {
+    $manager  = $this->user->check_permission('task_tracker_module_manage');
+    if (!$manager) {
+      return [false, 'User does not have permission to remove tasks.'];
+    }
+    
     $task_model = $this->load->model('TaskTracker');
     $result     = [false, 'Failed to retrieve data from Task Tracker model.'];
     
@@ -69,6 +99,11 @@ class TaskTracker extends OBFController {
   }
   
   public function updateTask () {
+    $manager  = $this->user->check_permission('task_tracker_module_manage');
+    if (!$manager) {
+      return [false, 'User does not have permission to update tasks.'];
+    }
+    
     $task_model = $this->load->model('TaskTracker');
     $result     = [false, 'Failed to retrieve data from Task Tracker model.'];
     
@@ -90,13 +125,20 @@ class TaskTracker extends OBFController {
     return $result;
   }
   
-  public function addComment () {
+  public function addComment () {    
     $task_model = $this->load->model('TaskTracker');
-    
+    $task_id    = $this->data('task_id');
+        
     $data = [
-      'task_id' => $this->data('task_id'),
+      'task_id' => $task_id,
       'comment' => $this->data('comment')      
     ];
+        
+    $manager  = $this->user->check_permission('task_tracker_module_manage');
+    $assigned = $task_model('currentUserAssigned', $task_id);
+    if (!$manager && !$assigned) {
+      return [false, 'User does not have permission to comment on current task'];
+    }
     
     $status = $task_model('validateComment', $data);
     if (!$status[0]) {

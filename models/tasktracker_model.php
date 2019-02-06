@@ -42,10 +42,19 @@ class TaskTrackerModel extends OBFModel {
     return [true, 'Successfully added task.'];
   }
   
-  public function loadTaskOverview () {
-    $this->db->orderby('id', 'desc');
+  public function loadTaskOverview ($user_id = null) {
+    $this->db->orderby('module_task_tracker.id', 'desc');
+    
+    if ($user_id !== null) {
+      $this->db->leftjoin('module_task_tracker_users', 'module_task_tracker_users.task_id', 'module_task_tracker.id');
+      $this->db->where('module_task_tracker_users.user_id', $user_id);
+      $this->db->what('module_task_tracker.id');
+      $this->db->what('description');
+      $this->db->what('name');
+    }
+    
     $tasks = $this->db->get('module_task_tracker');
-        
+            
     return [true, 'Successfully loaded tasks from database.', $tasks];
   }
   
@@ -153,6 +162,9 @@ class TaskTrackerModel extends OBFModel {
     $this->db->where('task_id', $data['task_id']);
     $result = $this->db->delete('module_task_tracker_playlists');
     
+    $this->db->where('task_id', $data['task_id']);
+    $result = $this->db->delete('module_task_tracker_comments');
+    
     return [true, 'Successfully removed task from database.'];
   }
   
@@ -231,5 +243,15 @@ class TaskTrackerModel extends OBFModel {
     $this->db->insert('module_task_tracker_comments', $comment);
     
     return [true, 'Comment submitted.'];
+  }
+  
+  public function currentUserAssigned ($task_id) {
+    $user_id = $this->user->param('id');
+    
+    $this->db->where('task_id', $task_id);
+    $this->db->where('user_id', $user_id);
+    $result = $this->db->get_one('module_task_tracker_users');
+    
+    return ($result ? true : false);
   }
 }

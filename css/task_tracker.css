@@ -22,6 +22,7 @@
 
 #task_tracker_list tr {
   padding-bottom: 6px;
+  height: 28px;
 }
 
 #task_tracker_users {
