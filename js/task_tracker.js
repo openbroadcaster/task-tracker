@@ -27,6 +27,8 @@ OBModules.TaskTracker = new function () {
     if (OB.Settings.permissions.includes('task_tracker_module_manage')) {
       OBModules.TaskTracker.loadUsers();
     
+      $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
+      
       $('#task_tracker_media').droppable({
         drop: OBModules.TaskTracker.droppableMedia
       });
@@ -195,6 +197,7 @@ OBModules.TaskTracker = new function () {
     var post              = {};
     post.task_name        = $('#task_tracker_name').val();
     post.task_description = $('#task_tracker_description').val();
+    post.task_due         = $('#task_tracker_due').val();
     
     post.task_users       = []; 
     $('#task_tracker_users_list div').each(function (index, element) {
@@ -320,8 +323,10 @@ OBModules.TaskTracker = new function () {
       
       if (response.status) {
         var task_id          = response.data.task.id;
+        var task_created     = response.data.task.created;
         var task_name        = response.data.task.name;
         var task_description = response.data.task.description;
+        var task_due         = response.data.task.due;
         var task_users       = response.data.users;
         var task_media       = response.data.media;
         var task_playlists   = response.data.playlists;
@@ -330,12 +335,17 @@ OBModules.TaskTracker = new function () {
         var task_perms       = response.data.permissions;
         
         $('#task_tracker_current_id').val(task_id);
+        $('#task_tracker_created').text(format_timestamp(task_created));
         
         $('#task_tracker_name').val(task_name);
         $('#task_tracker_name_view').text(task_name);
         
         $('#task_tracker_description').val(task_description);
         $('#task_tracker_description_view').text(task_description);
+        
+        $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
+        $('#task_tracker_due').val(format_timestamp(task_due).slice(0, 10));
+        $('#task_tracker_due_view').text(format_timestamp(task_due).slice(0, 10));
         
         if (task_perms == 'edit') {
           OBModules.TaskTracker.loadUsers();
@@ -505,6 +515,7 @@ OBModules.TaskTracker = new function () {
     post.task_id          = $('#task_tracker_current_id').val();
     post.task_name        = $('#task_tracker_name').val();
     post.task_description = $('#task_tracker_description').val();
+    post.task_due         = $('#task_tracker_due').val();
     
     post.task_users       = [];
     $('#task_tracker_users_list div').each(function (index, element) {

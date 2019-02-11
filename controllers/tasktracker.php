@@ -14,6 +14,7 @@ class TaskTracker extends OBFController {
     $data = [
       'name'        => $this->data('task_name'),
       'description' => $this->data('task_description'),
+      'due'         => $this->data('task_due'),
       'users'       => $this->data('task_users'),
       'media'       => $this->data('task_media'),
       'playlists'   => $this->data('task_playlists')
@@ -111,6 +112,7 @@ class TaskTracker extends OBFController {
       'id'          => $this->data('task_id'),
       'name'        => $this->data('task_name'),
       'description' => $this->data('task_description'),
+      'due'         => $this->data('task_due'),
       'users'       => $this->data('task_users'),
       'media'       => $this->data('task_media'),
       'playlists'   => $this->data('task_playlists')

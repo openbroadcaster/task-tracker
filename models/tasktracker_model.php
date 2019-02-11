@@ -5,6 +5,11 @@ class TaskTrackerModel extends OBFModel {
   public function validate ($data) {
     if ($data['name'] == '') return [false, 'Task name cannot be an empty string.'];
     
+    $task_due = $data['due'];
+    if ($task_due != '' && !preg_match('/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/', $task_due)) {
+      return [false, 'Invalid due date provided.'];
+    }
+    
     return [true, 'Data is valid.'];
   }
   
@@ -12,7 +17,11 @@ class TaskTrackerModel extends OBFModel {
     $task = [
       'name'        => $data['name'],
       'description' => $data['description'],
+      'created'     => time()
     ];
+    $task_due = $data['due'];
+    if ($task_due != '') $task['due'] = strtotime($task_due . ' 12:00');
+      
     $task_id = $this->db->insert('module_task_tracker', $task);
     
     foreach ($data['users'] as $user_item) {
@@ -172,8 +181,16 @@ class TaskTrackerModel extends OBFModel {
     $task_id   = $data['id'];
     $task_data = array(
       'name'        => $data['name'],
-      'description' => $data['description']
+      'description' => $data['description'],
     );
+    
+    $task_due = $data['due'];
+    if ($task_due != '') {
+      $task_data['due'] = strtotime($task_due . ' 12:00');
+    } else {
+      $task_data['due'] = null;
+    }
+    
     $task_users     = $data['users'];
     $task_media     = $data['media'];
     $task_playlists = $data['playlists'];
