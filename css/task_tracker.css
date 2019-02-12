@@ -43,3 +43,11 @@
   min-width: 400px;
   min-height: 60px;
 }
+
+.task_item_new {
+  color: greenyellow;
+}
+
+.task_item_in_progress {
+  color: darkorange;
+}

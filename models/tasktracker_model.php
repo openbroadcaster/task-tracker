@@ -3,7 +3,13 @@
 class TaskTrackerModel extends OBFModel {
   
   public function validate ($data) {
-    if ($data['name'] == '') return [false, 'Task name cannot be an empty string.'];
+    if ($data['name'] == '') {
+      return [false, 'Task name cannot be an empty string.'];
+    }
+    
+    if ($data['status'] != 'new' && $data['status'] != 'in progress' && $data['status'] != 'complete') {
+      return [false, 'Invalid task status selected.'];
+    }
     
     $task_due = $data['due'];
     if ($task_due != '' && !preg_match('/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/', $task_due)) {
@@ -59,6 +65,7 @@ class TaskTrackerModel extends OBFModel {
       $this->db->where('module_task_tracker_users.user_id', $user_id);
       $this->db->what('module_task_tracker.id');
       $this->db->what('description');
+      $this->db->what('status');
       $this->db->what('name');
     }
     
@@ -182,6 +189,7 @@ class TaskTrackerModel extends OBFModel {
     $task_data = array(
       'name'        => $data['name'],
       'description' => $data['description'],
+      'status'      => $data['status']
     );
     
     $task_due = $data['due'];
@@ -270,5 +278,28 @@ class TaskTrackerModel extends OBFModel {
     $result = $this->db->get_one('module_task_tracker_users');
     
     return ($result ? true : false);
+  }
+  
+  public function validateStatus ($data) {
+    if ($data['status'] != 'new' && $data['status'] != 'in progress' && $data['status'] != 'complete') {
+      return [false, 'Invalid task status selected.'];
+    }
+    
+    return [true, 'Data is valid.'];
+  }
+  
+  public function updateTaskStatus ($data) {
+    $task_id     = $data['id'];
+    $task_data   = array(
+      'status' => $data['status']
+    );
+    
+    $this->db->where('id', $task_id);
+    if (!$this->db->update('module_task_tracker', $task_data)) {
+      return [false, 'Failed to update task status in database.'];
+    }
+    
+    return [true, 'Successfully updated task status.'];
+    
   }
 }

@@ -23,6 +23,15 @@
     </div>
     
     <div class="fieldrow">
+      <label>Status</label>
+      <select id="task_tracker_status">
+        <option value="new">New</option>
+        <option value="in progress">In Progress</option>
+        <option value="complete">Complete</option>
+      </select>
+    </div>
+    
+    <div class="fieldrow">
       <label>Due Date</label>
       <input class="edit-perms" type="text" id="task_tracker_due" size="10" maxlength="10">
       <div class="view-perms" id="task_tracker_due_view"></div>
@@ -56,7 +65,7 @@
     </div>
 
     <div class="fieldrow">
-      <button class="edit edit-perms" onclick="OBModules.TaskTracker.updateTask();">Update Task</button>
+      <button class="edit" onclick="OBModules.TaskTracker.updateTask();">Update Task</button>
       <button onclick="OBModules.TaskTracker.closeTask();">Close Task</button>
       <input id="task_tracker_current_id" type="hidden">
     </div>

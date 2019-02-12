@@ -101,17 +101,36 @@ class TaskTracker extends OBFController {
   
   public function updateTask () {
     $manager  = $this->user->check_permission('task_tracker_module_manage');
-    if (!$manager) {
+    $task_model = $this->load->model('TaskTracker');
+    $assigned = $task_model('currentUserAssigned', $this->data('task_id'));
+    
+    if (!$manager && !$assigned) {
       return [false, 'User does not have permission to update tasks.'];
     }
     
-    $task_model = $this->load->model('TaskTracker');
+    if (!$manager) {
+      $result     = [false, 'Failed to update task status'];
+      $data = [
+        'id'     => $this->data('task_id'),
+        'status' => $this->data('task_status')
+      ];
+      
+      $result = $task_model('validateStatus', $data);
+      if (!$result[0]) {
+        return $result;
+      }
+      
+      $result = $task_model('updateTaskStatus', $data);
+      return $result;
+    }
+    
     $result     = [false, 'Failed to retrieve data from Task Tracker model.'];
     
     $data = [
       'id'          => $this->data('task_id'),
       'name'        => $this->data('task_name'),
       'description' => $this->data('task_description'),
+      'status'      => $this->data('task_status'),
       'due'         => $this->data('task_due'),
       'users'       => $this->data('task_users'),
       'media'       => $this->data('task_media'),

@@ -241,7 +241,21 @@ OBModules.TaskTracker = new function () {
       if (response.status) {
         $(response.data).each(function (index, element) {
           var item = $('<tr/>');
+          var task_status_class = 'task_item_new';
+          switch (element.status) {
+            case 'new':
+              task_status_class = 'task_item_new';
+              break;
+            case 'in progress':
+              task_status_class = 'task_item_in_progress';
+              break;
+            case 'complete':
+              task_status_class = 'task_item_complete';
+              break;
+          }
+          
           item.attr('data-task_id', element.id);
+          item.addClass(task_status_class);
           
           item.append($('<td/>').text(element.name).addClass('task_table_first'));
           item.append($('<td/>').text(element.description));
@@ -326,6 +340,7 @@ OBModules.TaskTracker = new function () {
         var task_created     = response.data.task.created;
         var task_name        = response.data.task.name;
         var task_description = response.data.task.description;
+        var task_status      = response.data.task.status;
         var task_due         = response.data.task.due;
         var task_users       = response.data.users;
         var task_media       = response.data.media;
@@ -342,6 +357,9 @@ OBModules.TaskTracker = new function () {
         
         $('#task_tracker_description').val(task_description);
         $('#task_tracker_description_view').text(task_description);
+        
+        $('#task_tracker_status option[value="' + task_status + '"]').prop('selected', true);
+        $('#task_tracker_status_view').text(task_status);
         
         $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
         $('#task_tracker_due').val(format_timestamp(task_due).slice(0, 10));
@@ -515,6 +533,7 @@ OBModules.TaskTracker = new function () {
     post.task_id          = $('#task_tracker_current_id').val();
     post.task_name        = $('#task_tracker_name').val();
     post.task_description = $('#task_tracker_description').val();
+    post.task_status      = $('#task_tracker_status').val();
     post.task_due         = $('#task_tracker_due').val();
     
     post.task_users       = [];
