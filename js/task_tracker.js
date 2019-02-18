@@ -228,8 +228,12 @@ OBModules.TaskTracker = new function () {
   /* loadTaskOverview(editable) is part of the open() method for the task
   list,  posting to the controller and putting all the retrieved information
   in the right fields in the HTML. */
-  this.loadTaskOverview = function (editable) {
-    OB.API.post('tasktracker', 'loadTaskOverview', {}, function (response) {
+  this.loadTaskOverview = function (editable, sort_by = 'created', sort_dir = 'desc') {
+    var post = {}
+    post.sort_by  = sort_by;
+    post.sort_dir = sort_dir;
+    
+    OB.API.post('tasktracker', 'loadTaskOverview', post, function (response) {
       
       var msg_result = (response.status ? 'success' : 'error');
       if (msg_result == 'error') {
@@ -239,8 +243,28 @@ OBModules.TaskTracker = new function () {
       $('#task_tracker_list').empty();
       
       if (response.status) {
+        if (response.data.length > 0) {
+          var item = $('<tr/>');
+          var sort_callback = 'return OBModules.TaskTracker.sortOverview(this, \'asc\')';
+          var sort_current  = 'return OBModules.TaskTracker.sortOverview(this, \'desc\')';
+          var is_current    = (sort_dir == 'asc') ? sort_by : null;
+          
+          item.append($('<th/>').append($('<a/>').text('Name').attr('onclick', (is_current == 'name') ? sort_current : sort_callback)));
+          item.append($('<th/>').append($('<a/>').text('Description').attr('onclick', (is_current == 'description') ? sort_current : sort_callback)));
+          item.append($('<th/>').append($('<a/>').text('Created').attr('onclick', (is_current == 'created') ? sort_current : sort_callback)));
+          item.append($('<th/>').append($('<a/>').text('Due').attr('onclick', (is_current == 'due') ? sort_current : sort_callback)));
+          item.append($('<th/>').append($('<a/>').text('Status').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
+          /* item.append($('<th/>').text('View'));
+          if (editable) item.append($('<th/>').text('Delete')); */
+          
+          $('#task_tracker_list').append(item);
+        }
+        
         $(response.data).each(function (index, element) {
           var item = $('<tr/>');
+          var task_created = format_timestamp(element.created).slice(0, 10);
+          var task_due     = format_timestamp(element.due).slice(0, 10);
+          
           var task_status_class = 'task_item_new';
           switch (element.status) {
             case 'new':
@@ -255,10 +279,12 @@ OBModules.TaskTracker = new function () {
           }
           
           item.attr('data-task_id', element.id);
-          item.addClass(task_status_class);
           
-          item.append($('<td/>').text(element.name).addClass('task_table_first'));
+          item.append($('<td/>').text(element.name));
           item.append($('<td/>').text(element.description));
+          item.append($('<td/>').text(task_created).addClass('task_table_date'));
+          item.append($('<td/>').text(task_due).addClass('task_table_date'));
+          item.append($('<td/>').text(element.status).addClass(task_status_class));
           
           item.append($('<td/>').append('<a class="button" onclick="return OBModules.TaskTracker.viewTask(this)" href="#">View</a>'));
           if (editable) item.append($('<td/>').append('<a class="button delete" onclick="return OBModules.TaskTracker.removeTask(this)" href="#">Delete</a>'));
@@ -274,6 +300,23 @@ OBModules.TaskTracker = new function () {
       }
       
     });
+  }
+  
+  /* sortOverview takes a </th> link and checks its value to see what to sort 
+  by, it also takes a sort direction set in the link (dynamically adjusted 
+  based on whether it was already clicked for ascending sort before). It then
+  calls reloads the task overview, this time sorting by a specific value and
+  in a specific direction. */
+  this.sortOverview = function (link, sort_dir) {
+    var sort_by = $(link).text().toLowerCase();
+    
+    if (OB.Settings.permissions.includes('task_tracker_module_manage')) {
+      OBModules.TaskTracker.loadTaskOverview(true, sort_by, sort_dir);
+    } else {
+      OBModules.TaskTracker.loadTaskOverview(false, sort_by, sort_dir);
+    }
+    
+    return false;
   }
   
   /* removeTask(link) removes an individual task from the database by

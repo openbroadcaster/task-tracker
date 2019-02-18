@@ -57,8 +57,27 @@ class TaskTrackerModel extends OBFModel {
     return [true, 'Successfully added task.'];
   }
   
-  public function loadTaskOverview ($user_id = null) {
-    $this->db->orderby('module_task_tracker.id', 'desc');
+  public function validateOverview ($data) {
+    $sort_by  = $data['sort_by'];
+    $sort_dir = $data['sort_dir'];
+    $valid    = array('name', 'description', 'created', 'due', 'status');
+    
+    if (!in_array($sort_by, $valid)) {
+      return [false, 'Invalid value to sort by.'];
+    }
+    
+    if ($sort_dir != 'asc' && $sort_dir != 'desc') {
+      return [false, 'Invalid sort direction.'];
+    }
+    
+    return [true, 'Data is valid.'];
+  }
+  
+  public function loadTaskOverview ($data, $user_id = null) {
+    $sort_by  = $data['sort_by'];
+    $sort_dir = $data['sort_dir'];
+    
+    $this->db->orderby('module_task_tracker.' . $sort_by, $sort_dir);
     
     if ($user_id !== null) {
       $this->db->leftjoin('module_task_tracker_users', 'module_task_tracker_users.task_id', 'module_task_tracker.id');
@@ -67,6 +86,8 @@ class TaskTrackerModel extends OBFModel {
       $this->db->what('description');
       $this->db->what('status');
       $this->db->what('name');
+      $this->db->what('created');
+      $this->db->what('due');
     }
     
     $tasks = $this->db->get('module_task_tracker');

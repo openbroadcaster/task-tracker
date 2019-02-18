@@ -50,11 +50,21 @@ class TaskTracker extends OBFController {
     $task_model = $this->load->model('TaskTracker');
     $result     = [false, 'Failed to retrieve data from Task Tracker model.'];
     
-    $manager    = $this->user->check_permission('task_tracker_module_manage');
+    $data = [
+      'sort_by'  => $this->data('sort_by'),
+      'sort_dir' => $this->data('sort_dir')
+    ];
+      
+    $result = $task_model('validateOverview', $data);
+    if (!$result[0]) {
+      return $result;
+    }
+    
+    $manager = $this->user->check_permission('task_tracker_module_manage');
     if ($manager) {
-      $result = $task_model('loadTaskOverview');      
+      $result = $task_model('loadTaskOverview', $data);      
     } else {
-      $result = $task_model('loadTaskOverview', $this->user->param('id'));
+      $result = $task_model('loadTaskOverview', $data, $this->user->param('id'));
     }
     
     return $result;

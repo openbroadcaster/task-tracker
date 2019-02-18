@@ -16,8 +16,13 @@
   margin-top: 0px;
 }
 
-#task_tracker_list td {
+#task_tracker_list td, #task_tracker_list th {
   padding-right: 8px;
+  max-width: 500px;
+}
+
+.task_table_date {
+  min-width: 80px;
 }
 
 #task_tracker_list tr {
@@ -34,10 +39,19 @@
   margin-bottom: 0px;
 }
 
-.task_table_first {
+#task_tracker_list th:first-child, #task_tracker_list td:first-child {
   text-align: right;
   width: 200px;
 }
+
+/* #task_tracker_list th:nth-child(n+2) {
+  text-align: left;
+} */
+
+#task_tracker_list th a {
+  display: block;
+}
+
 
 #task_tracker_comment {
   min-width: 400px;

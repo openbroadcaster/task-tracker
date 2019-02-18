@@ -12,14 +12,14 @@
     
     <div class="fieldrow">
       <label class="required">Name</label>
-      <input class="edit-perms" id="task_tracker_name" type="text">
-      <div class="view-perms" id="task_tracker_name_view"></div>
+      <input style="display: none;" class="edit-perms" id="task_tracker_name" type="text">
+      <div hidden class="view-perms" id="task_tracker_name_view"></div>
     </div>
     
     <div class="fieldrow">
       <label>Description</label>
-      <textarea class="edit-perms" id="task_tracker_description" rows="5"></textarea>
-      <div class="view-perms" id="task_tracker_description_view"></div>
+      <textarea hidden class="edit-perms" id="task_tracker_description" rows="5"></textarea>
+      <div hidden class="view-perms" id="task_tracker_description_view"></div>
     </div>
     
     <div class="fieldrow">
@@ -33,16 +33,16 @@
     
     <div class="fieldrow">
       <label>Due Date</label>
-      <input class="edit-perms" type="text" id="task_tracker_due" size="10" maxlength="10">
-      <div class="view-perms" id="task_tracker_due_view"></div>
+      <input style="display: none;" class="edit-perms" type="text" id="task_tracker_due" size="10" maxlength="10">
+      <div hidden class="view-perms" id="task_tracker_due_view"></div>
     </div>
     
     <div class="fieldrow">
       <label>Assigned Users</label>
       <div>
         <div>
-          <select class="edit-perms" id="task_tracker_users"></select>
-          <button class="add edit-perms" onclick="OBModules.TaskTracker.addUser();">Add User</button>
+          <select hidden class="edit-perms" id="task_tracker_users"></select>
+          <button hidden class="add edit-perms" onclick="OBModules.TaskTracker.addUser();">Add User</button>
         </div>
         <div id="task_tracker_users_list">
           <div id="task_tracker_users_list_dummy"></div>
