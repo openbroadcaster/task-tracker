@@ -289,8 +289,10 @@ OBModules.TaskTracker = new function () {
           item.append($('<td/>').text(task_due).addClass('task_table_date'));
           item.append($('<td/>').text(element.status).addClass(task_status_class));
           
-          item.append($('<td/>').append('<a class="button" onclick="return OBModules.TaskTracker.viewTask(this)" href="#">View</a>'));
-          if (editable) item.append($('<td/>').append('<a class="button delete" onclick="return OBModules.TaskTracker.removeTask(this)" href="#">Delete</a>'));
+          var $buttons = $('<td />');
+          $buttons.append('<a class="button" onclick="return OBModules.TaskTracker.viewTask(this)" href="#">View</a>');
+          if (editable) $buttons.append('<a class="button delete" onclick="return OBModules.TaskTracker.removeTask(this)" href="#">Delete</a>');
+          item.append($buttons);
           
           $('#task_tracker_list').append(item);
         })

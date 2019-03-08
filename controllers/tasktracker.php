@@ -17,7 +17,8 @@ class TaskTracker extends OBFController {
       'due'         => $this->data('task_due'),
       'users'       => $this->data('task_users'),
       'media'       => $this->data('task_media'),
-      'playlists'   => $this->data('task_playlists')
+      'playlists'   => $this->data('task_playlists'),
+      'status'      => 'new'
     ];
     
     $status = $task_model('validate', $data);
