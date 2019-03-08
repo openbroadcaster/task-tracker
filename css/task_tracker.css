@@ -25,6 +25,11 @@
   min-width: 80px;
 }
 
+#task_tracker_list
+{
+  max-width: 1200px;
+}
+
 #task_tracker_list tr {
   padding-bottom: 6px;
   height: 28px;
@@ -50,6 +55,7 @@
 
 #task_tracker_list th a {
   display: block;
+  cursor: pointer;
 }
 
 
@@ -64,4 +70,5 @@
 
 .task_item_in_progress {
   color: darkorange;
+  white-space: nowrap;
 }

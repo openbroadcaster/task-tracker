@@ -254,6 +254,9 @@ OBModules.TaskTracker = new function () {
           item.append($('<th/>').append($('<a/>').text('Created').attr('onclick', (is_current == 'created') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Due').attr('onclick', (is_current == 'due') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Status').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
+          item.append($('<th/>'));
+          item.append($('<th/>'));
+
           /* item.append($('<th/>').text('View'));
           if (editable) item.append($('<th/>').text('Delete')); */
           
