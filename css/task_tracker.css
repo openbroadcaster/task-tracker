@@ -16,6 +16,12 @@
   margin-top: 0px;
 }
 
+#task_tracker_media span,
+#task_tracker_playlists span
+{
+  cursor: pointer;
+}
+
 #task_tracker_list td, #task_tracker_list th {
   padding-right: 8px;
   max-width: 500px;

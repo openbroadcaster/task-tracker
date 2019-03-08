@@ -440,7 +440,7 @@ OBModules.TaskTracker = new function () {
           var elem_media_artist = element.media.artist;
           var elem_media_title  = element.media.title;
           
-          $html = $('<div/>').text(elem_media_artist + ' - ' + elem_media_title);
+          $html = $('<div/>').append( $('<span />').text(elem_media_artist + ' - ' + elem_media_title).click(function() { OB.Media.detailsPage(elem_media_id); }) );
           $html.attr('data-id', elem_media_id);
           
           if (task_perms == 'edit') {
@@ -455,7 +455,7 @@ OBModules.TaskTracker = new function () {
           var elem_playlist_name = element.playlist.name;
           var elem_playlist_desc = element.playlist.description;
           
-          $html = $('<div/>').text(elem_playlist_name + ' - ' + elem_playlist_desc);
+          $html = $('<div/>').append( $('<span />').text(elem_playlist_name + ' - ' + elem_playlist_desc).click(function() { OB.Playlist.detailsPage(elem_playlist_id); }) );
           $html.attr('data-id', elem_playlist_id);
           
           if (task_perms == 'edit') {
