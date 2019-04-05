@@ -134,7 +134,7 @@ OBModules.TaskTracker = new function () {
 
       OBModules.TaskTracker.updatePlaylistsDummy();
 
-      OB.Sidebar.mediaSelectNone();
+      OB.Sidebar.playlistSelectNone();
     }
   }
   
