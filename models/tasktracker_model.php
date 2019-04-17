@@ -16,6 +16,20 @@ class TaskTrackerModel extends OBFModel {
       return [false, 'Invalid due date provided.'];
     }
 
+    $media_model = $this->load->model('media');
+    foreach ($data['media'] as $media_id) {
+      if ($media_model('get_by_id', $media_id)['status'] != 'public') {
+        return [false, 'Private media cannot be used in tasks.'];
+      }
+    }
+
+    $playlists_model = $this->load->model('playlists');
+    foreach ($data['playlists'] as $playlist_id) {
+      if ($playlists_model('get_by_id', $playlist_id)['status'] != 'public') {
+        return [false, 'Private playlists cannot be used in tasks.'];
+      }
+    }
+
     return [true, 'Data is valid.'];
   }
 
@@ -112,16 +126,22 @@ class TaskTrackerModel extends OBFModel {
 
     $this->db->where('task_id', $data['task_id']);
     $media_items      = $this->db->get('module_task_tracker_media');
+    $media_model      = $this->load->model('media');
     $media            = [];
     foreach ($media_items as $elem) {
-      $media[] = $elem['media_id'];
+      if ($media_model('get_by_id', $elem['media_id'])['status'] == 'public') {
+        $media[] = $elem['media_id'];
+      }
     }
 
     $this->db->where('task_id', $data['task_id']);
     $playlists_items  = $this->db->get('module_task_tracker_playlists');
+    $playlists_model  = $this->load->model('playlists');
     $playlists        = [];
     foreach ($playlists_items as $elem) {
-      $playlists[] = $elem['playlist_id'];
+      if ($playlists_model('get_by_id', $elem['playlist_id'])['status'] == 'public') {
+        $playlists[] = $elem['playlist_id'];
+      }
     }
 
     $this->db->where('task_id', $data['task_id']);
