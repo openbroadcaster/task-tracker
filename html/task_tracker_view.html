@@ -1,27 +1,27 @@
 <div id="task_tracker_module">
 
   <h1>Task Tracker</h1>
-  
+
   <h2>View/Edit Task</h2>
-  
+
   <fieldset>
     <div class="fieldrow">
       <label>Created</label>
       <div id="task_tracker_created"></div>
     </div>
-    
+
     <div class="fieldrow">
       <label class="required">Name</label>
       <input style="display: none;" class="edit-perms" id="task_tracker_name" type="text">
       <div hidden class="view-perms" id="task_tracker_name_view"></div>
     </div>
-    
+
     <div class="fieldrow">
       <label>Description</label>
       <textarea hidden class="edit-perms" id="task_tracker_description" rows="5"></textarea>
       <div hidden class="view-perms" id="task_tracker_description_view"></div>
     </div>
-    
+
     <div class="fieldrow">
       <label>Status</label>
       <select id="task_tracker_status">
@@ -30,38 +30,26 @@
         <option value="complete">Complete</option>
       </select>
     </div>
-    
+
     <div class="fieldrow">
       <label>Due Date</label>
       <input style="display: none;" class="edit-perms" type="text" id="task_tracker_due" size="10" maxlength="10">
       <div hidden class="view-perms" id="task_tracker_due_view"></div>
     </div>
-    
+
     <div class="fieldrow">
       <label>Assigned Users</label>
-      <div>
-        <div>
-          <select hidden class="edit-perms" id="task_tracker_users"></select>
-          <button hidden class="add edit-perms" onclick="OBModules.TaskTracker.addUser();">Add User</button>
-        </div>
-        <div id="task_tracker_users_list">
-          <div id="task_tracker_users_list_dummy"></div>
-        </div>
-      </div>
+      <ob-user-input id="task_tracker_users"></ob-user-input>
     </div>
-    
+
     <div class="fieldrow">
       <label>Media Items</label>
-      <div id="task_tracker_media" class="droppable_target_media ui-droppable">
-        <div id="task_media_dummy"></div>
-      </div>
+      <ob-media-input id="task_tracker_media"></ob-media-input>
     </div>
-    
+
     <div class="fieldrow">
       <label>Playlist Items</label>
-      <div id="task_tracker_playlists" class="droppable_target_playlist ui-droppable">
-        <div id="task_playlists_dummy"></div>
-      </div>
+      <ob-playlist-input id="task_tracker_playlists"></ob-playlist-input>
     </div>
 
     <div class="fieldrow">
@@ -70,18 +58,18 @@
       <input id="task_tracker_current_id" type="hidden">
     </div>
   </fieldset>
-  
+
   <h2>Comments</h2>
-  
+
   <fieldset>
     <div class="fieldrow">
-      <textarea id="task_tracker_comment" placeholder="Add a comment to this task"></textarea>
+      <ob-html-input id="task_tracker_comment"></ob-html-input>
     </div>
-    
+
     <div class="fieldrow">
       <button class="add" onclick="OBModules.TaskTracker.addComment();">Add Comment</button>
     </div>
-    
+
     <div class="fieldrow">
       <div id="task_tracker_comment_list"></div>
     </div>
