@@ -36,7 +36,7 @@ class TaskTrackerModel extends OBFModel {
   public function addTask ($data) {
     $task = [
       'name'        => $data['name'],
-      'description' => $data['description'],
+      'description' => $this->helpers->sanitize_html($data['description']),
       'created'     => time()
     ];
     $task_due = $data['due'];
@@ -200,7 +200,7 @@ class TaskTrackerModel extends OBFModel {
     $task_id   = $data['id'];
     $task_data = array(
       'name'        => $data['name'],
-      'description' => $data['description'],
+      'description' => $this->helpers->sanitize_html($data['description']),
       'status'      => $data['status']
     );
 
@@ -274,7 +274,7 @@ class TaskTrackerModel extends OBFModel {
     $comment = [
       'task_id' => $data['task_id'],
       'user_id' => $user_id,
-      'comment' => $data['comment'],
+      'comment' => $this->helpers->sanitize_html($data['comment']),
       'created' => time()
     ];
     $this->db->insert('module_task_tracker_comments', $comment);

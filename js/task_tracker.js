@@ -115,7 +115,6 @@ OBModules.TaskTracker = new function () {
           var is_current    = (sort_dir == 'asc') ? sort_by : null;
 
           item.append($('<th/>').append($('<a/>').text('Name').attr('onclick', (is_current == 'name') ? sort_current : sort_callback)));
-          item.append($('<th/>').append($('<a/>').text('Description').attr('onclick', (is_current == 'description') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Created').attr('onclick', (is_current == 'created') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Due').attr('onclick', (is_current == 'due') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Status').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
@@ -149,7 +148,6 @@ OBModules.TaskTracker = new function () {
           item.attr('data-task_id', element.id);
 
           item.append($('<td/>').text(element.name));
-          item.append($('<td/>').text(element.description));
           item.append($('<td/>').text(task_created).addClass('task_table_date'));
           item.append($('<td/>').text(task_due).addClass('task_table_date'));
           item.append($('<td/>').text(element.status).addClass(task_status_class));

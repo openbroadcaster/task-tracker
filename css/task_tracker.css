@@ -19,8 +19,8 @@
 
 
 #task_tracker_list th:first-child, #task_tracker_list td:first-child {
-  text-align: right;
-  width: 200px;
+  text-align: left;
+  width: 300px;
 }
 
 /* #task_tracker_list th:nth-child(n+2) {
