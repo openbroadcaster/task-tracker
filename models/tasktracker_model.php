@@ -106,6 +106,19 @@ class TaskTrackerModel extends OBFModel {
 
     $tasks = $this->db->get('module_task_tracker');
 
+    foreach ($tasks as $i => $task) {
+      $this->db->where('task_id', $task['id']);
+      $this->db->what('user_id');
+      $assigned = $this->db->get('module_task_tracker_users');
+
+      $task['assigned'] = array();
+      foreach ($assigned as $assigned_user) {
+        $task['assigned'][] = $assigned_user['user_id'];
+      }
+
+      $tasks[$i] = $task;
+    }
+
     return [true, 'Successfully loaded tasks from database.', $tasks];
   }
 

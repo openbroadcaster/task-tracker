@@ -36,6 +36,14 @@ OBModules.TaskTracker = new function () {
     }
   }
 
+  /* newTaskWindow() is a replacement of the add task view being part of
+  the main view at first - it now opens a new modal window for creating
+  a new task. */
+  this.newTaskWindow = function () {
+    OB.UI.openModalWindow('modules/task_tracker/task_tracker_new.html');
+    $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
+  }
+
   /* removeItem(link) is called by links inside a list of new media or
   playlist items, and uses jQuery to remove the entire HTML element,
   thereby both removing it from the view *and* stopping an item from being
@@ -68,7 +76,7 @@ OBModules.TaskTracker = new function () {
   /* addTask() uses all the data in the input fields to add a new task to the
   database. */
   this.addTask = function () {
-    $('#task_tracker_message').obWidget('info', 'Adding new task to database.');
+    $('#task_tracker_new_message').obWidget('info', 'Adding new task to database.');
 
     var post              = {};
     post.task_name        = $('#task_tracker_name').val();
@@ -79,14 +87,15 @@ OBModules.TaskTracker = new function () {
     post.task_playlists   = $('#task_tracker_playlists').val();
 
     OB.API.post('tasktracker', 'addTask', post, function (response) {
-      if (response.status) {
-        /* $('#task_tracker_name').val('');
-        $('#task_tracker_description').val(''); */
-        OBModules.TaskTracker.open();
-      }
-
       var msg_result = (response.status ? 'success' : 'error');
-      $('#task_tracker_message').obWidget(msg_result, response.msg);
+
+      if (response.status) {
+        OB.UI.closeModalWindow();
+        OBModules.TaskTracker.open();
+        $('#task_tracker_message').obWidget(msg_result, response.msg);
+      } else {
+        $('#task_tracker_new_message').obWidget(msg_result, response.msg);
+      }
     });
   }
 
@@ -117,6 +126,7 @@ OBModules.TaskTracker = new function () {
           item.append($('<th/>').append($('<a/>').text('Name').attr('onclick', (is_current == 'name') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Created').attr('onclick', (is_current == 'created') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Due').attr('onclick', (is_current == 'due') ? sort_current : sort_callback)));
+          item.append($('<th/>').append($('<a/>').text('Assigned').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Status').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
           item.append($('<th/>'));
           item.append($('<th/>'));
@@ -150,6 +160,7 @@ OBModules.TaskTracker = new function () {
           item.append($('<td/>').text(element.name));
           item.append($('<td/>').text(task_created).addClass('task_table_date'));
           item.append($('<td/>').text(task_due).addClass('task_table_date'));
+          item.append($('<td/>').html($('<ob-user-input/>').addClass('readonly').val(element.assigned)));
           item.append($('<td/>').text(element.status).addClass(task_status_class));
 
           var $buttons = $('<td />');
@@ -396,6 +407,7 @@ OBModules.TaskTracker = new function () {
 
       var msg_result = (response.status ? 'success' : 'error');
       $('#task_tracker_message').obWidget(msg_result, response.msg);
+      $('#task_tracker_comment').val('');
     })
 
     return false;

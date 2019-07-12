@@ -4,50 +4,14 @@
 
   <obwidget type="message" id="task_tracker_message"></obwidget>
 
-  <h2 class="task_manager">Add Task</h2>
-
-  <fieldset class="task_manager">
-    <div class="fieldrow">
-      <label class="required">Name</label>
-      <input id="task_tracker_name" type="text">
-    </div>
-
-    <div class="fieldrow">
-      <label>Description</label>
-      <ob-html-input id="task_tracker_description" rows="5"></ob-html-input>
-    </div>
-
-    <div class="fieldrow">
-      <label>Due Date</label>
-      <input type="text" id="task_tracker_due" size="10" maxlength="10">
-    </div>
-
-    <div class="fieldrow">
-      <label>Assigned Users</label>
-      <ob-user-input id="task_tracker_users"></ob-user-input>
-    </div>
-
-    <div class="fieldrow">
-      <label>Media Items</label>
-      <ob-media-input id="task_tracker_media"></ob-media-input>
-    </div>
-
-    <div class="fieldrow">
-      <label>Playlist Items</label>
-      <ob-playlist-input id="task_tracker_playlists"></ob-playlist-input>
-    </div>
-
-    <div class="fieldrow">
-      <button class="add" onclick="OBModules.TaskTracker.addTask();">Add Task</button>
-    </div>
-  </fieldset>
-
-  <h2>Task List</h2>
-
   <fieldset>
     <div class="fieldrow">
       <div id="task_list_dummy">(no tasks found in database)</div>
       <table id="task_tracker_list" class="table"></table>
+    </div>
+
+    <div class="fieldrow task_manager">
+      <button class="add" onclick="OBModules.TaskTracker.newTaskWindow();">Add Task</button>
     </div>
   </fieldset>
 
