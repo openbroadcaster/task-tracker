@@ -7,10 +7,6 @@ class TaskTrackerModel extends OBFModel {
       return [false, 'Task name cannot be an empty string.'];
     }
 
-    if ($data['status'] != 'new' && $data['status'] != 'in progress' && $data['status'] != 'complete') {
-      return [false, 'Invalid task status selected.'];
-    }
-
     $task_due = $data['due'];
     if ($task_due != '' && !preg_match('/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/', $task_due)) {
       return [false, 'Invalid due date provided.'];
@@ -213,8 +209,7 @@ class TaskTrackerModel extends OBFModel {
     $task_id   = $data['id'];
     $task_data = array(
       'name'        => $data['name'],
-      'description' => $this->helpers->sanitize_html($data['description']),
-      'status'      => $data['status']
+      'description' => $this->helpers->sanitize_html($data['description'])
     );
 
     $task_due = $data['due'];

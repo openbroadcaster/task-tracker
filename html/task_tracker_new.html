@@ -34,7 +34,8 @@
   </div>
 
   <div class="fieldrow">
-    <button class="add" onclick="OBModules.TaskTracker.addTask();">Add Task</button>
+    <input type="hidden" id="task_tracker_update_id">
+    <button id="task_tracker_update_button" class="add" onclick="OBModules.TaskTracker.addTask();">Add Task</button>
     <button onclick="OB.UI.closeModalWindow();">Close</button>
   </div>
 </fieldset>

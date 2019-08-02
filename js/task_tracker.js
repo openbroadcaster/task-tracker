@@ -73,32 +73,6 @@ OBModules.TaskTracker = new function () {
     }
   }
 
-  /* addTask() uses all the data in the input fields to add a new task to the
-  database. */
-  this.addTask = function () {
-    $('#task_tracker_new_message').obWidget('info', 'Adding new task to database.');
-
-    var post              = {};
-    post.task_name        = $('#task_tracker_name').val();
-    post.task_description = $('#task_tracker_description').val();
-    post.task_due         = $('#task_tracker_due').val();
-    post.task_users       = $('#task_tracker_users').val();
-    post.task_media       = $('#task_tracker_media').val();
-    post.task_playlists   = $('#task_tracker_playlists').val();
-
-    OB.API.post('tasktracker', 'addTask', post, function (response) {
-      var msg_result = (response.status ? 'success' : 'error');
-
-      if (response.status) {
-        OB.UI.closeModalWindow();
-        OBModules.TaskTracker.open();
-        $('#task_tracker_message').obWidget(msg_result, response.msg);
-      } else {
-        $('#task_tracker_new_message').obWidget(msg_result, response.msg);
-      }
-    });
-  }
-
   /* loadTaskOverview(editable) is part of the open() method for the task
   list,  posting to the controller and putting all the retrieved information
   in the right fields in the HTML. */
@@ -126,7 +100,7 @@ OBModules.TaskTracker = new function () {
           item.append($('<th/>').append($('<a/>').text('Name').attr('onclick', (is_current == 'name') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Created').attr('onclick', (is_current == 'created') ? sort_current : sort_callback)));
           item.append($('<th/>').append($('<a/>').text('Due').attr('onclick', (is_current == 'due') ? sort_current : sort_callback)));
-          item.append($('<th/>').append($('<a/>').text('Assigned').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
+          item.append($('<th/>').text('Assigned'));
           item.append($('<th/>').append($('<a/>').text('Status').attr('onclick', (is_current == 'status') ? sort_current : sort_callback)));
           item.append($('<th/>'));
           item.append($('<th/>'));
@@ -165,6 +139,7 @@ OBModules.TaskTracker = new function () {
 
           var $buttons = $('<td />');
           $buttons.append('<a class="button" onclick="return OBModules.TaskTracker.viewTask(this)" href="#">View</a>');
+          if (editable) $buttons.append('<a class="button edit" onclick="return OBModules.TaskTracker.editTask(this)" href="#">Edit</a>');
           if (editable) $buttons.append('<a class="button delete" onclick="return OBModules.TaskTracker.removeTask(this)" href="#">Delete</a>');
           item.append($buttons);
 
@@ -274,30 +249,21 @@ OBModules.TaskTracker = new function () {
         $('#task_tracker_current_id').val(task_id);
         $('#task_tracker_created').text(format_timestamp(task_created));
 
-        $('#task_tracker_name').val(task_name);
+        //$('#task_tracker_name').val(task_name);
         $('#task_tracker_name_view').text(task_name);
 
-        $('#task_tracker_description').val(task_description);
-        $('#task_tracker_description_view').text(task_description);
+        //$('#task_tracker_description').val(task_description);
+        $('#task_tracker_description_view').html(task_description);
 
         $('#task_tracker_status option[value="' + task_status + '"]').prop('selected', true);
-        $('#task_tracker_status_view').text(task_status);
 
-        $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
-        $('#task_tracker_due').val(format_timestamp(task_due).slice(0, 10));
+        //$('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
+        //$('#task_tracker_due').val(format_timestamp(task_due).slice(0, 10));
         $('#task_tracker_due_view').text(format_timestamp(task_due).slice(0, 10));
 
-        if (task_perms == 'edit') {
-          $('#task_tracker_module .edit-perms').show();
-          $('#task_tracker_module .view-perms').hide();
-        } else {
-          $('#task_tracker_module .edit-perms').hide();
-          $('#task_tracker_module .view-perms').show();
-
-          OB.UI.userReadOnly($('#task_tracker_users'));
-          OB.UI.mediaReadOnly($('#task_tracker_media'));
-          OB.UI.playlistReadOnly($('#task_tracker_playlists'));
-        }
+        OB.UI.userReadOnly($('#task_tracker_users'));
+        OB.UI.mediaReadOnly($('#task_tracker_media'));
+        OB.UI.playlistReadOnly($('#task_tracker_playlists'));
 
         $('#task_tracker_users').val(task_users);
         $('#task_tracker_media').val(task_media);
@@ -322,6 +288,34 @@ OBModules.TaskTracker = new function () {
     });
 
     return false;
+  }
+
+  /* editTask is similar to newTaskWindow in that it opens a modal window,
+  but also populates it with all the pre-existing data. */
+  this.editTask = function (link) {
+    OB.UI.openModalWindow('modules/task_tracker/task_tracker_new.html');
+    var task_id = $(link).parents('tr').first().attr('data-task_id');
+    $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
+    $('#task_tracker_update_button').text('Update Task');
+    $('#task_tracker_update_id').val(task_id);
+
+    OB.API.post('tasktracker', 'viewTask', {task_id: task_id}, function (response) {
+      var msg_result = (response.status ? 'success' : 'error');
+      if (msg_result == 'error') {
+        OB.UI.closeModalWindow();
+
+        $('#task_tracker_new_message').obWidget(msg_result, response.msg);
+      }
+
+      if (response.status) {
+        $('#task_tracker_name').val(response.data.task.name);
+        $('#task_tracker_description').val(response.data.task.description);
+        $('#task_tracker_due').val(format_timestamp(response.data.task.due).slice(0, 10));
+        $('#task_tracker_users').val(response.data.users);
+        $('#task_tracker_media').val(response.data.media);
+        $('#task_tracker_playlists').val(response.data.playlists);
+      }
+    });
   }
 
   /* refreshComments(task_id) is called when viewTask is excessive, and
@@ -362,25 +356,74 @@ OBModules.TaskTracker = new function () {
     });
   }
 
+  /* updateStatus() is used in the single view for quickly updating the
+  status of a task. */
+  this.updateStatus = function () {
+    var post = {};
+    post.task_id     = $('#task_tracker_current_id').val();
+    post.task_status = $('#task_tracker_status').val();
+
+    OB.API.post('tasktracker', 'updateStatus', post, function (response) {
+      var msg_result = (response.status ? 'success' : 'error');
+      $('#task_tracker_view_message').obWidget(msg_result, response.msg);
+    });
+  }
+
+  /* addTask() uses all the data in the input fields to add a new task to the
+  database. Or, if the task_tracker_update_id is set, it will instead call
+  updateTask(). */
+  this.addTask = function () {
+    if ($('#task_tracker_update_id').val() != "") {
+      $('#task_tracker_new_message').obWidget('info', 'Updating task.');
+      OBModules.TaskTracker.updateTask();
+
+      return false;
+    } else {
+      $('#task_tracker_new_message').obWidget('info', 'Adding new task to database.');
+
+      var post              = {};
+      post.task_name        = $('#task_tracker_name').val();
+      post.task_description = $('#task_tracker_description').val();
+      post.task_due         = $('#task_tracker_due').val();
+      post.task_users       = $('#task_tracker_users').val();
+      post.task_media       = $('#task_tracker_media').val();
+      post.task_playlists   = $('#task_tracker_playlists').val();
+
+      OB.API.post('tasktracker', 'addTask', post, function (response) {
+        var msg_result = (response.status ? 'success' : 'error');
+
+        if (response.status) {
+          OB.UI.closeModalWindow();
+          OBModules.TaskTracker.open();
+          $('#task_tracker_message').obWidget(msg_result, response.msg);
+        } else {
+          $('#task_tracker_new_message').obWidget(msg_result, response.msg);
+        }
+      });
+    }
+  }
+
   /* updateTask() updates the values of a single task viewed in the
   individual task view. */
   this.updateTask = function () {
     var post = {};
-    post.task_id          = $('#task_tracker_current_id').val();
+    post.task_id          = $('#task_tracker_update_id').val();
     post.task_name        = $('#task_tracker_name').val();
     post.task_description = $('#task_tracker_description').val();
-    post.task_status      = $('#task_tracker_status').val();
     post.task_due         = $('#task_tracker_due').val();
-
     post.task_users       = $('#task_tracker_users').val();
     post.task_media       = $('#task_tracker_media').val();
     post.task_playlists   = $('#task_tracker_playlists').val();
 
     OB.API.post('tasktracker', 'updateTask', post, function (response) {
-      OBModules.TaskTracker.open();
-
       var msg_result = (response.status ? 'success' : 'error');
-      $('#task_tracker_message').obWidget(msg_result, response.msg);
+      if (response.status) {
+        OB.UI.closeModalWindow();
+        OBModules.TaskTracker.open();
+        $('#task_tracker_message').obWidget(msg_result, response.msg);
+      } else {
+        $('#task_tracker_new_message').obWidget(msg_result, response.msg);
+      }
     });
 
     return false;
