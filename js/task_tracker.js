@@ -369,6 +369,8 @@ OBModules.TaskTracker = new function () {
 
     var assigned = $('#task_tracker_users').val();
     $('#task_tracker_pay_users').val(assigned);
+    $('#task_tracker_pay_amount').text($('#task_payment_amount').text());
+    $('#task_tracker_pay_comment').val($('#task_payment_comment').html());
   }
 
   /* Callback for removing unassigned users from the list when adding a
@@ -376,6 +378,32 @@ OBModules.TaskTracker = new function () {
   this.removeUnassigned = function () {
     $('#task_tracker_pay_users select').find(':not([disabled])').remove();
     $('#task_tracker_pay_users select').prepend('<option value>Select User</option>');
+  }
+
+  /* addTransaction uses the Payments controller to compensate each of the
+  users selected in the payment modal window. */
+  this.addTransaction = function () {
+    var posts = [];
+    $.each($('#task_tracker_pay_users').val(), function (i, user_id) {
+      var post = {};
+      post.type = 'compensation';
+      post.amount = $('#task_tracker_pay_multiplier').val() * parseFloat($('#task_tracker_pay_amount').text().substr(1));
+      post.created = new Date().toJSON().slice(0, 10);
+      post.comment = $('#task_tracker_pay_comment').val();
+      post.user_id = user_id;
+
+      posts.push(['payments', 'transaction_add', post]);
+    })
+
+    OB.API.multiPost(posts, function (responses) {
+      OB.UI.closeModalWindow();
+
+      $.each(responses, function (i, response) {
+        var msg_result = (response.status ? 'success' : 'error');
+        $('#task_tracker_view_message').obWidget(msg_result, response.msg);
+        console.log(response)
+      });
+    });
   }
 
   /* refreshComments(task_id) is called when viewTask is excessive, and
