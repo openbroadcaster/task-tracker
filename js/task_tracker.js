@@ -297,6 +297,9 @@ OBModules.TaskTracker = new function () {
 
           if (OBModules.Payments != undefined) {
             $('.task_payment').show();
+            if (!OB.Settings.permissions.includes('task_tracker_module_manage')) {
+              $('.task_payment_admin').hide();
+            }
           }
         }
 
@@ -357,6 +360,22 @@ OBModules.TaskTracker = new function () {
         }
       }
     });
+  }
+
+  /* payTask opens a new modal window for compensating users assigned to a
+  task. */
+  this.payTask = function () {
+    OB.UI.openModalWindow('modules/task_tracker/task_tracker_pay.html');
+
+    var assigned = $('#task_tracker_users').val();
+    $('#task_tracker_pay_users').val(assigned);
+  }
+
+  /* Callback for removing unassigned users from the list when adding a
+  transaction. */
+  this.removeUnassigned = function () {
+    $('#task_tracker_pay_users select').find(':not([disabled])').remove();
+    $('#task_tracker_pay_users select').prepend('<option value>Select User</option>');
   }
 
   /* refreshComments(task_id) is called when viewTask is excessive, and
