@@ -33,6 +33,27 @@
     <ob-playlist-input id="task_tracker_playlists"></ob-playlist-input>
   </div>
 
+  <div hidden class="fieldrow task_payment">
+    <label>Pay Item</label>
+    <select id="task_payment_item">
+      <option value="complete">Complete Task</option>
+      <option value="media">Per Media Item</option>
+      <option value="playlist">Per Playlist Item</option>
+      <option value="mediaplaylist">Per Media/Playlist Item</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+
+  <div hidden class="fieldrow task_payment">
+    <label>Pay Amount</label>
+    <input id="task_payment_amount" type="number" placeholder="0.00" step="0.01">
+  </div>
+
+  <div hidden class="fieldrow task_payment">
+    <label>Pay Comment</label>
+    <ob-html-input id="task_payment_comment"></ob-html-input>
+  </div>
+
   <div class="fieldrow">
     <input type="hidden" id="task_tracker_update_id">
     <button id="task_tracker_update_button" class="add" onclick="OBModules.TaskTracker.addTask();">Add Task</button>

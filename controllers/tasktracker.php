@@ -21,6 +21,12 @@ class TaskTracker extends OBFController {
       'status'      => 'new'
     ];
 
+    if (!empty($this->data('task_payment_item')) && !empty($this->data('task_payment_amount'))) {
+      $data['payment_item'] = $this->data('task_payment_item');
+      $data['payment_amount'] = $this->data('task_payment_amount');
+      if (!empty($this->data('task_payment_comment'))) $data['payment_comment'] = $this->data('task_payment_comment');
+    }
+
     $status = $task_model('validate', $data);
     if (!$status[0]) {
       return $status;
@@ -170,6 +176,12 @@ class TaskTracker extends OBFController {
       'media'       => $this->data('task_media'),
       'playlists'   => $this->data('task_playlists')
     ];
+
+    if (!empty($this->data('task_payment_item')) && !empty($this->data('task_payment_amount'))) {
+      $data['payment_item'] = $this->data('task_payment_item');
+      $data['payment_amount'] = $this->data('task_payment_amount');
+      if (!empty($this->data('task_payment_comment'))) $data['payment_comment'] = $this->data('task_payment_comment');
+    }
 
     $result = $task_model('validate', $data);
     if (!$result[0]) {

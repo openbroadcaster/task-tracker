@@ -51,6 +51,21 @@
       <ob-playlist-input id="task_tracker_playlists"></ob-playlist-input>
     </div>
 
+    <div hidden class="fieldrow task_payment">
+      <label>Pay Item</label>
+      <span id="task_payment_item"></span>
+    </div>
+
+    <div hidden class="fieldrow task_payment">
+      <label>Pay Amount</label>
+      <span id="task_payment_amount"></span>
+    </div>
+
+    <div hidden class="fieldrow task_payment">
+      <label>Pay Comment</label>
+      <div id="task_payment_comment"></div>
+    </div>
+
     <div class="fieldrow">
       <button onclick="OBModules.TaskTracker.closeTask();">Close Task</button>
       <input id="task_tracker_current_id" type="hidden">

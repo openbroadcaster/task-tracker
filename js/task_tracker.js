@@ -42,6 +42,9 @@ OBModules.TaskTracker = new function () {
   this.newTaskWindow = function () {
     OB.UI.openModalWindow('modules/task_tracker/task_tracker_new.html');
     $('#task_tracker_due').datepicker({ dateFormat: "yy-mm-dd" });
+    if (OBModules.Payments != undefined) {
+      $('.task_payment').show();
+    }
   }
 
   /* removeItem(link) is called by links inside a list of new media or
@@ -269,6 +272,34 @@ OBModules.TaskTracker = new function () {
         $('#task_tracker_media').val(task_media);
         $('#task_tracker_playlists').val(task_playlists);
 
+        if (response.data.payment != undefined) {
+          var payment_item = 'Other';
+          switch (response.data.payment.type) {
+            case 'complete':
+              payment_item = 'Complete Task';
+              break;
+            case 'media':
+              payment_item = 'Per Media Item';
+              break;
+            case 'playlist':
+              payment_item = 'Per Playlist Item';
+              break;
+            case 'mediaplaylist':
+              payment_item = 'Per Media/Playlist Item';
+              break;
+            default:
+              payment_item = 'Other';
+          }
+
+          $('#task_payment_item').text(payment_item);
+          $('#task_payment_amount').text('$' + response.data.payment.amount);
+          $('#task_payment_comment').html(response.data.payment.comment);
+
+          if (OBModules.Payments != undefined) {
+            $('.task_payment').show();
+          }
+        }
+
         $(task_comments).each(function (index, element) {
           var elem_comm_text = element.comment;
           var elem_comm_user = element.user.display_name;
@@ -299,6 +330,10 @@ OBModules.TaskTracker = new function () {
     $('#task_tracker_update_button').text('Update Task');
     $('#task_tracker_update_id').val(task_id);
 
+    if (OBModules.Payments != undefined) {
+      $('.task_payment').show();
+    }
+
     OB.API.post('tasktracker', 'viewTask', {task_id: task_id}, function (response) {
       var msg_result = (response.status ? 'success' : 'error');
       if (msg_result == 'error') {
@@ -314,6 +349,12 @@ OBModules.TaskTracker = new function () {
         $('#task_tracker_users').val(response.data.users);
         $('#task_tracker_media').val(response.data.media);
         $('#task_tracker_playlists').val(response.data.playlists);
+
+        if (response.data.payment != undefined) {
+          $('#task_payment_item').val(response.data.payment.type);
+          $('#task_payment_amount').val(response.data.payment.amount);
+          $('#task_payment_comment').val(response.data.payment.comment);
+        }
       }
     });
   }
@@ -389,6 +430,12 @@ OBModules.TaskTracker = new function () {
       post.task_media       = $('#task_tracker_media').val();
       post.task_playlists   = $('#task_tracker_playlists').val();
 
+      if (OBModules.Payments != undefined) {
+        post.task_payment_item    = $('#task_payment_item').val();
+        post.task_payment_amount  = $('#task_payment_amount').val();
+        post.task_payment_comment = $('#task_payment_comment').val();
+      }
+
       OB.API.post('tasktracker', 'addTask', post, function (response) {
         var msg_result = (response.status ? 'success' : 'error');
 
@@ -414,6 +461,12 @@ OBModules.TaskTracker = new function () {
     post.task_users       = $('#task_tracker_users').val();
     post.task_media       = $('#task_tracker_media').val();
     post.task_playlists   = $('#task_tracker_playlists').val();
+
+    if (OBModules.Payments != undefined) {
+      post.task_payment_item    = $('#task_payment_item').val();
+      post.task_payment_amount  = $('#task_payment_amount').val();
+      post.task_payment_comment = $('#task_payment_comment').val();
+    }
 
     OB.API.post('tasktracker', 'updateTask', post, function (response) {
       var msg_result = (response.status ? 'success' : 'error');

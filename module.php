@@ -57,6 +57,16 @@ class TaskTrackerModule extends OBFModule {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
 
+    // Add task payment info table.
+    $this->db->query('CREATE TABLE IF NOT EXISTS `module_task_tracker_payments` (
+      `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+      `task_id` int(10) unsigned NOT NULL,
+      `amount` decimal(13, 2) NOT NULL,
+      `type` ENUM(\'complete\', \'media\', \'playlist\', \'mediaplaylist\', \'other\') NOT NULL,
+      `comment` text,
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+
     return true;
   }
 

@@ -26,6 +26,18 @@ class TaskTrackerModel extends OBFModel {
       }
     }
 
+    if (isset($data['payment_item'])) {
+      $item = $data['payment_item'];
+      if ($item != 'complete' && $item != 'media' && $item != 'playlist'
+      && $item != 'mediaplaylist' && $item != 'other') {
+        return [false, 'Invalid payment item type.'];
+      }
+
+      if ($data['payment_amount'] < 0) {
+        return [false, 'Payment amount cannot be negative.'];
+      }
+    }
+
     return [true, 'Data is valid.'];
   }
 
@@ -62,6 +74,17 @@ class TaskTrackerModel extends OBFModel {
         'playlist_id' => $playlist_item
       ];
       $this->db->insert('module_task_tracker_playlists', $playlist);
+    }
+
+    if (isset($data['payment_item'])) {
+      $comment = (isset($data['payment_comment']) ? $data['payment_comment'] : '');
+      $payment = [
+        'task_id'     => $task_id,
+        'amount'      => $data['payment_amount'],
+        'type'        => $data['payment_item'],
+        'comment'     => $comment
+      ];
+      $this->db->insert('module_task_tracker_payments', $payment);
     }
 
     return [true, 'Successfully added task.'];
@@ -179,6 +202,17 @@ class TaskTrackerModel extends OBFModel {
       'playlists' => $playlists,
       'comments'  => $comments
     );
+
+    $this->db->where('task_id', $data['task_id']);
+    $payment = $this->db->get_one('module_task_tracker_payments');
+    if ($payment) {
+      $result['payment'] = array(
+        'amount'  => $payment['amount'],
+        'type'    => $payment['type'],
+        'comment' => $payment['comment']
+      );
+    }
+
     return [true, 'Successfully loaded task from database.', $result];
   }
 
@@ -201,6 +235,9 @@ class TaskTrackerModel extends OBFModel {
 
     $this->db->where('task_id', $data['task_id']);
     $result = $this->db->delete('module_task_tracker_comments');
+
+    $this->db->where('task_id', $data['task_id']);
+    $this->db->delete('module_task_tracker_payments');
 
     return [true, 'Successfully removed task from database.'];
   }
@@ -261,6 +298,20 @@ class TaskTrackerModel extends OBFModel {
         'playlist_id' => $playlist_item
       ];
       $this->db->insert('module_task_tracker_playlists', $playlist);
+    }
+
+    if (isset($data['payment_item'])) {
+      $this->db->where('task_id', $task_id);
+      $this->db->delete('module_task_tracker_payments');
+
+      $comment = (isset($data['payment_comment']) ? $data['payment_comment'] : '');
+      $payment = [
+        'task_id'     => $task_id,
+        'amount'      => $data['payment_amount'],
+        'type'        => $data['payment_item'],
+        'comment'     => $comment
+      ];
+      $this->db->insert('module_task_tracker_payments', $payment);
     }
 
     return [true, 'Successfully updated task'];
