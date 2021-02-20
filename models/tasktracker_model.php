@@ -12,9 +12,9 @@ class TaskTrackerModel extends OBFModel {
       return [false, 'Invalid due date provided.'];
     }
 
-    $media_model = $this->load->model('media');
+    $models = OBFModels::get_instance();
     foreach ($data['media'] as $media_id) {
-      if ($media_model('get_by_id', $media_id)['status'] != 'public') {
+      if ($models->media('get_by_id', ['id' => $media_id])['status'] != 'public') {
         return [false, 'Private media cannot be used in tasks.'];
       }
     }
@@ -158,10 +158,10 @@ class TaskTrackerModel extends OBFModel {
 
     $this->db->where('task_id', $data['task_id']);
     $media_items      = $this->db->get('module_task_tracker_media');
-    $media_model      = $this->load->model('media');
+    $models           = OBFModels::get_instance();
     $media            = [];
     foreach ($media_items as $elem) {
-      if ($media_model('get_by_id', $elem['media_id'])['status'] == 'public') {
+      if ($models->media('get_by_id', ['id' => $elem['media_id']])['status'] == 'public') {
         $media[] = $elem['media_id'];
       }
     }
