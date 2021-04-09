@@ -2,7 +2,7 @@
 
 class TaskTrackerModule extends OBFModule {
 
-  public $name        = "Task Tracker v0.1";
+  public $name        = "Task Tracker v1.0";
   public $description = "Tracks tasks with assigned playlists and media items.";
 
   public function callbacks () {
