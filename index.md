@@ -2,13 +2,10 @@
 layout: default
 title: index
 ---
+# Task Tracker 
+{:.no_toc}
 
 * TOC
-{:toc}
-
-<a name="dashboard"></a>
-
-## Using the Task Tracker module
 {:toc}
 
 ![ Task Tracker](img/task-tracker.png ){: .Task Tracker}
