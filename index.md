@@ -21,5 +21,6 @@ Review notes from users on tasks
 
 Sort Tasks by `New`, `In Progress` and `Complete`
 
-`Compensate Users`, pay per media or play lists item when tasks are `Complete` with 
-__Payments module__
+`Compensate Users`, pay per media or play lists item when tasks are `Complete` 
+
+Integrates with [Payments](https://github.com/openbroadcaster/payments/) module
