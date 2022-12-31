@@ -5,7 +5,7 @@ title: index
 
 <br/>
 
-![ Task Tracker](img/task-tracker.png ){: .Task Tracker}
+![ Task Tracker](img/task-tracker.png ){: .screenshot}
 
 # Task Tracker 
 {:.no_toc}
